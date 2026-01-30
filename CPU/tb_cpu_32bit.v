@@ -18,6 +18,7 @@ module tb_cpu_32bit;
 
     integer cycle;
     integer max_cycles;
+    integer i;
 
     function [31:0] encode_rtype;
         input [4:0] op, dst, src1, src2;
@@ -74,6 +75,10 @@ module tb_cpu_32bit;
         $display("====================================================");
         $display("           32-bit CPU Test");
         $display("====================================================\n");
+
+        // Initialize all instruction memory to HALT to avoid x's
+        for (i = 0; i < 256; i = i + 1)
+            instr_mem[i] = {5'b11111, 27'b0};
 
         instr_mem[0] = encode_itype(5'b01000, 5'd1, 5'd0, 17'd10);
         instr_mem[1] = encode_itype(5'b01000, 5'd2, 5'd0, 17'd20);
