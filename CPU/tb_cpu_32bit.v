@@ -28,7 +28,7 @@ module tb_cpu_32bit;
 
     function [31:0] encode_itype;
         input [4:0] op, dst, src1;
-        input [20:0] imm;
+        input [16:0] imm;
         begin
             encode_itype = {op, dst, src1, imm};
         end
@@ -75,16 +75,16 @@ module tb_cpu_32bit;
         $display("           32-bit CPU Test");
         $display("====================================================\n");
 
-        instr_mem[0] = encode_itype(5'b01000, 5'd1, 5'd0, 21'd15);
-        instr_mem[1] = encode_itype(5'b01000, 5'd2, 5'd0, 21'd25);
+        instr_mem[0] = encode_itype(5'b01000, 5'd1, 5'd0, 17'd10);
+        instr_mem[1] = encode_itype(5'b01000, 5'd2, 5'd0, 17'd20);
         instr_mem[2] = encode_rtype(5'b00000, 5'd3, 5'd1, 5'd2);
         instr_mem[3] = encode_rtype(5'b00001, 5'd4, 5'd2, 5'd1);
         instr_mem[4] = encode_rtype(5'b00010, 5'd5, 5'd1, 5'd2);
         instr_mem[5] = encode_rtype(5'b00011, 5'd6, 5'd1, 5'd2);
         instr_mem[6] = encode_rtype(5'b00100, 5'd7, 5'd1, 5'd2);
-        instr_mem[7] = encode_itype(5'b01100, 5'd0, 5'd0, 21'd0);
-        instr_mem[8] = encode_itype(5'b01100, 5'd0, 5'd0, 21'd4);
-        instr_mem[9] = encode_itype(5'b01011, 5'd1, 5'd0, 21'd0);
+        instr_mem[7] = encode_itype(5'b01100, 5'd0, 5'd0, 17'd0);
+        instr_mem[8] = encode_itype(5'b01100, 5'd0, 5'd0, 17'd4);
+        instr_mem[9] = encode_itype(5'b01011, 5'd1, 5'd0, 17'd0);
         instr_mem[10] = {5'b11111, 27'b0};
 
         rst = 1'b1;
@@ -94,20 +94,22 @@ module tb_cpu_32bit;
         rst = 1'b0;
 
         $display("Starting execution...\n");
-        $display("Cycle  PC       Instr       Halted");
-        $display("------ -------- ----------- ------");
+        $display("Cycle  PC       Instr       Halted  WE Dst Data");
+        $display("------ -------- ----------- ------  -- --- --------");
 
         while (!halted && cycle < max_cycles) begin
             @(posedge clk);
-            $display("%5d  0x%06h  0x%08h    %b", cycle, pc, instr, halted);
+            $display("%5d  0x%06h  0x%08h    %b  WE=%b Dst=R%0d Data=0x%08h", 
+                     cycle, pc, instr, halted, 
+                     DUT.do_regwr, DUT.dst_reg, DUT.wb_data);
             cycle = cycle + 1;
         end
 
         $display("\n====================================================");
         $display("Register File State:");
         $display("  R0 = 0x%08h (always 0)", DUT.REGS.regs[0]);
-        $display("  R1 = 0x%08h (expected: 0x0000000F = 15)", DUT.REGS.regs[1]);
-        $display("  R2 = 0x%08h (expected: 0x00000019 = 25)", DUT.REGS.regs[2]);
+        $display("  R1 = 0x%08h (expected: 0x0000000A = 10)", DUT.REGS.regs[1]);
+        $display("  R2 = 0x%08h (expected: 0x00000014 = 20)", DUT.REGS.regs[2]);
         $display("  R3 = 0x%08h (expected: 0x0000001E = 30)", DUT.REGS.regs[3]);
         $display("  R4 = 0x%08h (expected: 0x0000000A = 10)", DUT.REGS.regs[4]);
         $display("  R5 = 0x%08h", DUT.REGS.regs[5]);

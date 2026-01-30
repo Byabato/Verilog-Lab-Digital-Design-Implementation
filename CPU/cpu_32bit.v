@@ -21,7 +21,7 @@ module regfile_32bit (
     always @(posedge clk or posedge rst) begin
         if (rst) begin
             for (i = 0; i < 8; i = i + 1)
-                regs[i] <= {29'b0, i[2:0]};
+                regs[i] <= 32'h00000000;
         end else if (write_en && write_addr != 5'b00000) begin
             regs[write_addr[2:0]] <= write_data;
         end
@@ -184,15 +184,15 @@ module cpu_32bit (
     wire [4:0]  dst_reg;
     wire [4:0]  src_reg_1;
     wire [4:0]  src_reg_2;
-    wire [20:0] imm_value;
+    wire [16:0] imm_value;
     wire [31:0] imm_ext;
 
     assign op_code = instr[31:27];
     assign dst_reg = instr[26:22];
     assign src_reg_1 = instr[21:17];
     assign src_reg_2 = instr[16:12];
-    assign imm_value = instr[20:0];
-    assign imm_ext = {{11{imm_value[20]}}, imm_value};
+    assign imm_value = instr[16:0];
+    assign imm_ext = {{15{imm_value[16]}}, imm_value};
 
     wire do_regwr, do_memrd, do_memwr, alu_use_imm, wb_from_mem, do_branch, do_jump, halted_sig;
     wire [3:0] alu_func;
@@ -211,6 +211,13 @@ module cpu_32bit (
     );
 
     wire [31:0] src_val_1, src_val_2;
+    wire [31:0] wb_data;
+    wire [31:0] alu_out;
+    wire [31:0] alu_in_2;
+    wire        alu_zero;
+
+    assign wb_data = wb_from_mem ? mem_data_in : alu_out;
+
     regfile_32bit REGS (
         .clk(clk),
         .rst(rst),
@@ -222,10 +229,6 @@ module cpu_32bit (
         .read_data_1(src_val_1),
         .read_data_2(src_val_2)
     );
-
-    wire [31:0] alu_in_2;
-    wire [31:0] alu_out;
-    wire        alu_zero;
 
     assign alu_in_2 = alu_use_imm ? imm_ext : src_val_2;
 
@@ -241,9 +244,6 @@ module cpu_32bit (
     assign mem_data_out = src_val_2;
     assign mem_we = do_memwr & ~cpu_halted;
     assign mem_re = do_memrd & ~cpu_halted;
-
-    wire [31:0] wb_data;
-    assign wb_data = wb_from_mem ? mem_data_in : alu_out;
 
     reg [31:0] pc_reg;
     wire [31:0] pc_next_seq;
