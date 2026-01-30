@@ -298,4 +298,4 @@ Each design includes comprehensive testbenches with:
 **Created:** 30th January, 2026  
 **Laboratory:** Computer Architecture and Digital Design  
 **Language:** Verilog  
-**Tools:** Icarus Verilog (iverilog), GTKWave
+**Tools:** Icarus Verilog (iverilog), GTKWave, Yosys, Logism. 
