@@ -294,7 +294,7 @@ Each design includes comprehensive testbenches with:
 - COAVL Online Virtual Labs (experiment theory)
 
 ---
-**Created By:** Kelvin Byabato, UDSM.  
+**Created By:** [Kelvin Byabato](https://github.com/Byabato), UDSM.  
 **Created:** 30th January, 2026  
 **Laboratory:** Computer Architecture and Digital Design  
 **Language:** Verilog  
