@@ -112,7 +112,7 @@ module alu_16bit #(
     wire sign_b = input_b[WIDTH-1];
     wire sign_result = output_result[WIDTH-1];
 
-    assign carry_flag = temp_result[WIDTH];
+    assign carry_flag = (operation == OP_SUB) ? ~temp_result[WIDTH] : temp_result[WIDTH];
     assign overflow_flag = (operation == OP_ADD) ? ((~sign_a & ~sign_b & sign_result) | (sign_a & sign_b & ~sign_result)) :
                           (operation == OP_SUB) ? ((~sign_a & sign_b & sign_result) | (sign_a & ~sign_b & ~sign_result)) :
                           (operation == OP_INC) ? (~sign_a & sign_result) :
