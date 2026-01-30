@@ -16,6 +16,7 @@ module tb_mips_scp;
 
     integer cycle;
     integer max_cyc;
+    integer i;
 
     function [31:0] make_rtype;
         input [5:0] fn;
@@ -75,6 +76,14 @@ module tb_mips_scp;
         $display("====================================================");
         $display("      Single-Cycle MIPS Processor Test");
         $display("====================================================\n");
+
+        // Initialize all instruction memory to NOP to avoid x's
+        for (i = 0; i < 256; i = i + 1)
+            iram[i] = 32'h00000000;
+
+        // Initialize all data memory to zero to avoid x's
+        for (i = 0; i < 256; i = i + 1)
+            dram[i] = 32'h00000000;
 
         iram[0]  = make_itype(6'b001000, 5'd0, 5'd1, 16'd8);
         iram[1]  = make_itype(6'b001000, 5'd0, 5'd2, 16'd12);

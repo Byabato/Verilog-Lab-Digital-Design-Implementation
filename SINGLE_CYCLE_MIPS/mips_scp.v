@@ -13,13 +13,13 @@ module mips_regfile #(parameter REGS = 32) (
 );
 
     reg [31:0] mem [0:REGS-1];
+    integer i;
 
     assign out_a = (read_a == 5'b00000) ? 32'h00000000 : mem[read_a];
     assign out_b = (read_b == 5'b00000) ? 32'h00000000 : mem[read_b];
 
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            integer i;
             for (i = 0; i < REGS; i = i + 1)
                 mem[i] <= 32'h00000000;
         end else if (write_en && write_a != 5'b00000) begin
